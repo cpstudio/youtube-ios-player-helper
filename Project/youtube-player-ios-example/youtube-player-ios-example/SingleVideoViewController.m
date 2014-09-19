@@ -86,4 +86,19 @@
   self.statusTextView.scrollEnabled = YES;
 }
 
+- (void)playerView:(YTPlayerView *)playerView didChangeToState:(YTPlayerState)state {
+    switch (state) {
+        case kYTPlayerStatePlaying:
+            NSLog(@"Started playback");
+            break;
+        case kYTPlayerStatePaused:
+            NSLog(@"Paused playback");
+            break;
+        case kYTPlayerStateTimeUpdate:
+            NSLog(@"TIME UPDATE!!!!!!!!!!!! %f", self.playerView.currentTime);
+        default:
+            break;
+    }
+}
+
 @end

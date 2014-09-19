@@ -26,6 +26,7 @@ NSString static *const kYTPlayerStatePausedCode = @"2";
 NSString static *const kYTPlayerStateBufferingCode = @"3";
 NSString static *const kYTPlayerStateCuedCode = @"5";
 NSString static *const kYTPlayerStateUnknownCode = @"unknown";
+NSString static *const kYTPlayerStateTimeUpdateCode = @"timeupdate";
 
 // Constants representing playback quality.
 NSString static *const kYTPlaybackQualitySmallQuality = @"small";
@@ -390,6 +391,23 @@ NSString static *const kYTPlayerEmbedUrlRegexPattern = @"^http(s)://(www.)youtub
 - (BOOL)webView:(UIWebView *)webView
     shouldStartLoadWithRequest:(NSURLRequest *)request
                 navigationType:(UIWebViewNavigationType)navigationType {
+    //MOD START
+    // リクエストに「ios-log:#iOS#」が含まれる場合には、リクエストをキャッチする。
+    NSString* nextUrl=[[request URL] absoluteString];
+    NSRange range;
+    if ((range=[nextUrl rangeOfString:@"ios-log:"]).location!=NSNotFound) {
+        
+        // リクエスト内容から、ログ内容を取得する。
+        NSString *iOSLog = [nextUrl stringByReplacingOccurrencesOfString:@"ios-log:"withString:@""];
+        // 文字列はパーセントエスケープされているので、デコードする。
+        iOSLog = [iOSLog stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        NSLog(@"%@",iOSLog);
+        
+        // このリクエストは、ここで中断する。
+        return NO;
+    }
+    //MOD END
+
   if ([request.URL.scheme isEqual:@"ytplayer"]) {
     [self notifyDelegateOfYouTubeCallbackUrl:request.URL];
     return NO;
@@ -540,6 +558,8 @@ NSString static *const kYTPlayerEmbedUrlRegexPattern = @"^http(s)://(www.)youtub
         state = kYTPlayerStateQueued;
       } else if ([data isEqual:kYTPlayerStateUnstartedCode]) {
         state = kYTPlayerStateUnstarted;
+      } else if ([data isEqual:kYTPlayerStateTimeUpdateCode]) {
+        state = kYTPlayerStateTimeUpdate;
       }
 
       [self.delegate playerView:self didChangeToState:state];

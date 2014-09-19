@@ -24,6 +24,19 @@
     <div id="player"></div>
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
+    // window.console.logを上書きすると動かない場合もあるので、
+    // 今回は新しいメソッドを定義する。
+    window.log = function(msg) {
+        var iframe = document.createElement("IFRAME");
+        iframe.setAttribute("src", "ios-log:#iOS#" + msg);
+        document.documentElement.appendChild(iframe);
+        iframe.parentNode.removeChild(iframe);
+        iframe = null;
+    }
+    window.onerror = function(errMsg, url, lineNumber) {
+        window.log(errMsg + ", file=" + url + ":" + lineNumber);
+    }
+
     var player;
     YT.ready(function() {
       player = new YT.Player('player', %@);
@@ -31,9 +44,22 @@
     });
     function onReady(event) {
         window.location.href = 'ytplayer://onReady?data=' + event.data;
+        window.log('ONREADY');
     }
+    var __id;
     function onStateChange(event) {
         window.location.href = 'ytplayer://onStateChange?data=' + event.data;
+        if (event.data === YT.PlayerState.PLAYING) {
+            __id = setInterval(function(){
+                               window.log('SETINTERVAL TIMEUPDATE');
+                    window.location.href = 'ytplayer://onStateChange?data=timeupdate';
+            },1000);
+            
+        } else if (event.data === YT.PlayerState.ENDED || event.data === YT.PlayerState.PAUSED) {
+            window.log('STOP');
+            clearInterval(__id);
+        }
+        //window.log(player.d.src);
     }
 
     function onPlaybackQualityChange(event) {
