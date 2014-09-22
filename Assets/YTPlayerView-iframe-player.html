@@ -50,6 +50,10 @@
     function onStateChange(event) {
         window.location.href = 'ytplayer://onStateChange?data=' + event.data;
         if (event.data === YT.PlayerState.PLAYING) {
+            if (__id) {
+                clearInterval(__id);
+                __id = null;
+            }
             __id = setInterval(function(){
                     window.log('SETINTERVAL TIMEUPDATE');
                     window.location.href = 'ytplayer://onStateChange?data=timeupdate';
