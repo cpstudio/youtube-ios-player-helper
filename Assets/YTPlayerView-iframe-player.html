@@ -51,7 +51,7 @@
         window.location.href = 'ytplayer://onStateChange?data=' + event.data;
         if (event.data === YT.PlayerState.PLAYING) {
             __id = setInterval(function(){
-                               window.log('SETINTERVAL TIMEUPDATE');
+                    window.log('SETINTERVAL TIMEUPDATE');
                     window.location.href = 'ytplayer://onStateChange?data=timeupdate';
             },1000);
             
@@ -59,7 +59,6 @@
             window.log('STOP');
             clearInterval(__id);
         }
-        //window.log(player.d.src);
     }
 
     function onPlaybackQualityChange(event) {
